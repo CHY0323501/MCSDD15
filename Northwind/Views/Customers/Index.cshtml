@@ -1,69 +1,61 @@
-﻿@model IEnumerable<Northwind.Models.Customers>
+﻿@*@model IEnumerable<Northwind.Models.Customers>*@
+@using PagedList.Mvc;
+@using PagedList
+@model IPagedList<Northwind.Models.Customers>
+
 
 @{
     ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout_Manager.cshtml";
 }
 
-<h2>Index</h2>
+<h2>客戶列表</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("新增客戶", "Create","",new { @class="btn btn-success"})
 </p>
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.CompanyName)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().CustomerID)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ContactName)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().CompanyName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ContactTitle)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().ContactName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Address)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().ContactTitle)
         </th>
-        <th>
-            @Html.DisplayNameFor(model => model.PostalCode)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Phone)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Fax)
-        </th>
+
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.CompanyName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ContactName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ContactTitle)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Address)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.PostalCode)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Phone)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Fax)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.CustomerID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.CustomerID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.CustomerID })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CustomerID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CompanyName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ContactName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ContactTitle)
+            </td>
+
+            <td>
+                @Html.ActionLink("編輯", "Edit", new { id = item.CustomerID,page=Request.QueryString["page"] }) |
+                @Html.ActionLink("詳細資料", "Details", new { id = item.CustomerID ,page=Request.QueryString["page"]})
+            </td>
+        </tr>
+    }
 
 </table>
+<div class="text-center">
+    @Html.PagedListPager(Model,page=>Url.Action("Index",new { page}))
+</div>

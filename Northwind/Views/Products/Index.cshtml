@@ -1,0 +1,104 @@
+﻿@model IEnumerable<Northwind.Models.Products>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout_Manager.cshtml";
+    var result = "";
+    var selected="";
+}
+
+<h2>產品清單</h2>
+
+<form action="@Url.Action("Index")" id="form1">
+    <div class="form-group">
+        <label class="col-md-2">產品分類：</label>
+        <div class="col-md-10">
+            <select id="cid" name="cid" class="form-control">
+                @foreach (var i in ViewBag.Categories)
+                {
+                    selected = i.CategoryID == ViewBag.CID ? "selected" : "";
+                    <option value="@i.CategoryID" @selected>@i.CategoryName</option>
+                }
+            </select>
+        </div>
+    </div>
+</form>
+
+<p>
+    @Html.ActionLink("新增產品", "Create",new { cid=ViewBag.CID})
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ProductName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.QuantityPerUnit)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UnitPrice)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UnitsInStock)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UnitsOnOrder)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ReorderLevel)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Suppliers.CompanyName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Discontinued)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.QuantityPerUnit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UnitPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UnitsInStock)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UnitsOnOrder)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReorderLevel)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Suppliers.CompanyName)
+            </td>
+            <td>
+                @{
+                    result = item.Discontinued == true ? "已下架" : "上架中";
+                }
+                @result
+                @*@Html.DisplayFor(modelItem => item.Discontinued)*@
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.ProductID ,cid=ViewBag.CID}, new { @class = "btn btn-success" })
+            </td>
+        </tr>
+    }
+
+</table>
+@section script{
+    <script>
+        $('#cid').change(function () {
+            $('#form1').submit();
+        })
+    </script>
+}
+

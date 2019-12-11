@@ -1,23 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.Entity;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using Northwind.Models;
+using PagedList;
+using System.Configuration;
 
 namespace Northwind.Controllers
 {
+    [LoginRule]
     public class CustomersController : Controller
     {
         private NorthwindEntities db = new NorthwindEntities();
 
         // GET: Customers
-        public ActionResult Index()
+        public ActionResult Index(int page=1)
         {
-            return View(db.Customers.ToList());
+            //if (Session["employee"] == null)
+            //    return RedirectToAction("Login","Manager");
+
+            var list = db.Customers.ToList();
+
+            int pagesize = 20;
+            int pagecurrent = page < 1 ? 1 : page;
+            var pagedlist = list.ToPagedList(pagecurrent, pagesize);
+
+            return View("Index",pagedlist);
         }
 
         // GET: Customers/Details/5
@@ -41,9 +55,7 @@ namespace Northwind.Controllers
             return View();
         }
 
-        // POST: Customers/Create
-        // 若要免於過量張貼攻擊，請啟用想要繫結的特定屬性，如需
-        // 詳細資訊，請參閱 https://go.microsoft.com/fwlink/?LinkId=317598。
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "CustomerID,CompanyName,ContactName,ContactTitle,Address,PostalCode,Phone,Fax")] Customers customers)
@@ -73,19 +85,43 @@ namespace Northwind.Controllers
             return View(customers);
         }
 
-        // POST: Customers/Edit/5
-        // 若要免於過量張貼攻擊，請啟用想要繫結的特定屬性，如需
-        // 詳細資訊，請參閱 https://go.microsoft.com/fwlink/?LinkId=317598。
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "CustomerID,CompanyName,ContactName,ContactTitle,Address,PostalCode,Phone,Fax")] Customers customers)
         {
-            if (ModelState.IsValid)
+            try
             {
-                db.Entry(customers).State = EntityState.Modified;
-                db.SaveChanges();
+                SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["NorthwindConnectionString"].ConnectionString);
+                //使用ado.net直接呼叫函數，可直接寫函數名稱就好，在指定cmd類型即可
+                SqlCommand cmd = new SqlCommand("updateCustomer",conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("CompanyName",customers.CompanyName);
+                cmd.Parameters.AddWithValue("ContactName",customers.ContactName);
+                cmd.Parameters.AddWithValue("ContactTitle", customers.ContactTitle);
+                cmd.Parameters.AddWithValue("Address", customers.Address);
+                cmd.Parameters.AddWithValue("PostalCode", customers.PostalCode);
+                cmd.Parameters.AddWithValue("Phone", customers.Phone);
+                cmd.Parameters.AddWithValue("Fax", customers.Fax);
+                cmd.Parameters.AddWithValue("CustomerID", customers.CustomerID);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+
+                conn.Close();
+
                 return RedirectToAction("Index");
             }
+            catch(DbException e) {
+                ViewBag.Ex = e.Message;
+            }
+
+            //if (ModelState.IsValid)
+            //{
+            //    db.Entry(customers).State = EntityState.Modified;
+            //    db.SaveChanges();
+            //    return RedirectToAction("Index");
+            //}
             return View(customers);
         }
 

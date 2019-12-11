@@ -28,6 +28,7 @@ namespace Northwind.Models
             [DisplayName("客戶編號")]
             [Required(ErrorMessage = "請輸入客戶編號")]
             [RegularExpression("[A-Z]{5}", ErrorMessage = "請輸入A~Z英文五碼")]
+            [CheckCustomerID]
             public string CustomerID { get; set; }
             [DisplayName("公司名稱")]
             [Required(ErrorMessage = "請輸入公司名稱")]
@@ -204,7 +205,7 @@ namespace Northwind.Models
         [Required(ErrorMessage = "請輸入安全存量")]
         [Range(0, int.MaxValue, ErrorMessage = "安全存量不可小於0")]
         public short ReorderLevel { get; set; }
-        [DisplayName("不再銷售")]
+        [DisplayName("上架狀態")]
         [Required(ErrorMessage = "請選擇是否繼續銷售")]
         [DefaultValue(false)]
         public bool Discontinued { get; set; }
@@ -257,4 +258,20 @@ namespace Northwind.Models
 
     }
 
+    public class CheckCustomerID:ValidationAttribute
+    {
+        NorthwindEntities db = new NorthwindEntities();
+
+        public CheckCustomerID() {
+            ErrorMessage = "帳號重複";
+        }
+
+        public override bool IsValid(object value)
+        {
+            var result = db.Customers.Where(c => c.CustomerID == value.ToString()).FirstOrDefault();
+            if (result == null)
+                return true;
+            return false;
+        }
+    }
 }
