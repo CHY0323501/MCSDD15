@@ -197,7 +197,7 @@ namespace Northwind.Models
         [Required(ErrorMessage = "請輸入庫存量")]
         [Range(0, int.MaxValue, ErrorMessage = "庫存量不可小於0")]
         public short UnitsInStock { get; set; }
-        [DisplayName("已訂購量")]
+        [DisplayName("已採購量")]
         [Required(ErrorMessage = "請輸入已訂購量")]
         [Range(0, int.MaxValue, ErrorMessage = "已訂購量不可小於0")]
         public short UnitsOnOrder { get; set; }
@@ -205,7 +205,7 @@ namespace Northwind.Models
         [Required(ErrorMessage = "請輸入安全存量")]
         [Range(0, int.MaxValue, ErrorMessage = "安全存量不可小於0")]
         public short ReorderLevel { get; set; }
-        [DisplayName("上架狀態")]
+        [DisplayName("是否下架")]
         [Required(ErrorMessage = "請選擇是否繼續銷售")]
         [DefaultValue(false)]
         public bool Discontinued { get; set; }

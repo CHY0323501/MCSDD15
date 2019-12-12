@@ -68,6 +68,7 @@ namespace Northwind.Controllers
                 return HttpNotFound();
             }
 
+            TempData["id"] = id;
             ViewBag.CID = cid;
             ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "CategoryName", products.CategoryID);
             ViewBag.SupplierID = new SelectList(db.Suppliers, "SupplierID", "CompanyName", products.SupplierID);
@@ -76,17 +77,21 @@ namespace Northwind.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ProductID,ProductName,SupplierID,CategoryID,QuantityPerUnit,UnitPrice,UnitsInStock,UnitsOnOrder,ReorderLevel,Discontinued")] Products products,int cid)
+        public ActionResult Edit(int cid, short UnitsInStock,short ReorderLevel,bool Discontinued)
         {
+            Products p = db.Products.Find((int)TempData["id"]);
             if (ModelState.IsValid)
             {
-                db.Entry(products).State = EntityState.Modified;
+                p.UnitsInStock = UnitsInStock;
+                p.ReorderLevel = ReorderLevel;
+                p.Discontinued = Discontinued;
+
                 db.SaveChanges();
                 return RedirectToAction("Index",new { cid=cid});
             }
-            ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "CategoryName", products.CategoryID);
-            ViewBag.SupplierID = new SelectList(db.Suppliers, "SupplierID", "CompanyName", products.SupplierID);
-            return View(products);
+            ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "CategoryName", p.CategoryID);
+            ViewBag.SupplierID = new SelectList(db.Suppliers, "SupplierID", "CompanyName", p.SupplierID);
+            return View(p);
         }
 
         protected override void Dispose(bool disposing)

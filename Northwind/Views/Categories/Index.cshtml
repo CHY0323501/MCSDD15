@@ -5,10 +5,10 @@
     Layout = "~/Views/Shared/_Layout_Manager.cshtml";
 }
 
-<h2>Index</h2>
+<h2>商品類別</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("新增類別", "Create")
 </p>
 <table class="table">
     <tr>
@@ -33,7 +33,7 @@
             @Html.DisplayFor(modelItem => item.Description)
         </td>
         <td>
-            <img src="@Url.Action("GetImage","Categories",new { id=item.CategoryID })" alt="" />
+            <img src="@Url.Action("GetImage","Categories",new { id=item.CategoryID })" alt="" style="max-height:200px"/>
         </td>
         
     </tr>
